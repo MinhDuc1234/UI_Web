@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <% include ../partials/css %>
+  <style>
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+
+    }
+
+    html,
+    body {
+      background-image: url('/adminpage/assets/images/bg_checkin.png');
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover;
+
+      margin: 0;
+      padding: 0;
+    }
+
+    .online {
+      position: fixed;
+      top: 0;
+      right: 0;
+      box-shadow: 0 0 4px 3px #50c249;
+      border-radius: 20px;
+      margin: 20px;
+    }
+
+    .online img {
+      float: left;
+    }
+
+    .online h3 {
+      margin: 0;
+      display: unset;
+      padding: 10px;
+    }
+
+    .my-title {
+      text-align: center;
+      font-size: 27px;
+      font-family: inherit;
+      margin: 20px 0 20px 0;
+      color: #2E9AFE;
+    }
+
+    .table-responsive {
+      margin-top: 70px;
+
+    }
+
+    #datatable td,
+    #datatable th {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    #box1,
+    #box2 {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: space-around;
+      position: relative;
+      height: 100%;
+    }
+  </style>
+  <title>Ranking</title>
+  <link href="/adminpage/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+  <link href="/adminpage/assets/plugins/datatables/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+  <link href="/adminpage/assets/plugins/datatables/jquery.dataTables.min" rel="stylesheet" type="text/css" />
+
+  
+</head>
+
+<body>
+  <div style="position: fixed; top: 80px; left: 30px; height: 90%;">
+    <div id="box1">
+    </div>
+  </div>
+  <div style="position: fixed; top: 80px; right: 30px; height: 90%;">
+    <div id="box2">
+    </div>
+  </div>
+
+
+  <header class="sign-up log-in">
+    <div class='online'>
+      <img src="/adminpage/assets/images/eye.png" alt="">
+      <h3 id='numOfOnline'>0</h3>
+    </div>
+    <div class="sign-up-content">
+
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+
+            <div class="card-box table-responsive" style="margin-top: 120px;">
+
+              <h4 class="m-t-0 header-title my-title">Ranking List</h4>
+              <div style="text-align: center;" onclick="stopUpdate()"><button>Stop update</button></div>
+
+              <div class="container" style="overflow-x: auto">
+
+                <table cellspacing="0" id="datatable" class="table table-hover table-bordered"
+                  style="width: 100%; min-width: 600px;">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Fullname</th>
+                      <th>University</th>
+                      <th>English Club</th>
+                      <th>Achivements</th>
+                      <th>Rank</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end row -->
+      </div>
+      <!-- container -->
+
+    </div>
+
+  </header>
+  <% include ../partials/scripts %>
+  <script src="/adminpage/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="/adminpage/assets/plugins/datatables/dataTables.bootstrap4.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
+
+  <script>
+    function updateDataTable() {
+      $.post('/admin/users/status/getData', function (x) {
+        //Lưu danh sách những top trường có sv tham gia đông nhất.
+        let topSchool = [];
+        for (let i = 0; i < x.length; i++) {
+          if (topSchool.length == 0) {
+            //Khởi tạo
+            topSchool.push({ university: x[i].university, num: 1 })
+          }
+          else {
+            //
+            let j = 0;
+            let size = topSchool.length
+            for (j = 0; j < size; j++) {
+              if (topSchool[j].university == x[i].university) {
+                topSchool[j].num++;
+                break;
+              }
+            }
+            if (size == j) {
+              topSchool.push({ university: x[i].university, num: 1 })
+            }
+          }
+        }
+        topSchool = topSchool.sort(function (a, b) {
+          return - a.num + b.num
+        })
+        $.post('/admin/users/status/getUniversity', function (schools) {
+          let box1 = document.getElementById('box1');
+
+          box1.innerHTML = ""
+
+          for (let i = 0; i < topSchool.length; i++)
+            if (i < 5) {
+              let div = document.createElement("div");
+              let j = 0;
+              for (j = 0; j < schools.length; j++) {
+                if (topSchool[i].university == schools[j].name)
+                  break;
+              }
+              div.innerHTML = '<img class="media-object" src="' + window.location.origin + schools[j].image + '" height=50 alt="No image">'
+              div.innerHTML += '<br/>' + '<b style="font-size: 20px;" >' + 'Participants: ' + topSchool[i].num + '</b>'
+              box1.appendChild(div)
+            }
+        })
+
+        //Top CLB
+        let topClb = [];
+        for (let i = 0; i < x.length; i++) {
+          if (topClb.length == 0) {
+            //Khởi tạo
+            topClb.push({ clb: x[i].clb, num: 1 })
+          }
+          else {
+            //
+            let j = 0;
+            let size = topClb.length
+            for (j = 0; j < size; j++) {
+              if (topClb[j].clb == x[i].clb) {
+                topClb[j].num++;
+                break;
+              }
+            }
+            if (size == j) {
+              topClb.push({ clb: x[i].clb, num: 1 })
+            }
+          }
+        }
+        topClb = topClb.sort(function (a, b) {
+          return - a.num + b.num
+        })
+
+        //Xuất
+        let box2 = document.getElementById('box2');
+
+        box2.innerHTML = ""
+        // console.log
+        for (let i = 0; i < topClb.length; i++)
+          if (i < 5) {
+            let div = document.createElement("div");
+
+            div.innerHTML = '<img class="media-object" src="' + window.location.origin + "/homepage/images/logoclb/" + topClb[i].clb + ".png" + '" width=100 alt="No image">'
+            div.innerHTML += '<br/>' + '<b style="font-size: 20px;" >' + 'Participants: ' + topClb[i].num + '</b>'
+            box2.appendChild(div)
+          }
+        //End of clb
+
+
+        document.getElementById('numOfOnline').innerText = x.length;
+
+        $('#datatable').dataTable({
+          "data": x,
+          columns: [
+            { mData: 'data' },
+            { mData: 'fullname' },
+            { mData: 'university' },
+            { mData: 'clb' },
+            { mData: 'numOfJoiningStaff' },
+            { mData: 'rank' }
+          ], "order": [[4, 'desc']],
+          dom: 'Bfrtip',
+          buttons: [
+            // 'excel', 'print'
+            {
+              extend: 'excel',
+              text: 'Export to excel',
+              exportOptions: {
+                modifier: {
+                  page: 'current'
+                }
+              }
+            }
+          ],
+          "pageLength": 2000,
+          destroy: true,
+
+        });
+
+        $('#datatable').dataTable().fnClearTable();
+        $('#datatable').dataTable().fnAddData(x);
+      });
+    }
+    var runInterval = setInterval(updateDataTable, 3000)
+    function stopUpdate() {
+      clearInterval(runInterval)
+    }
+
+  </script>
+
+</body>
+
+</html>

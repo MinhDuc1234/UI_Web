@@ -1,0 +1,90 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <!-- title -->
+  <title>English Camp 2019 - Ngày hội sinh viên với ngoại ngữ</title>
+
+  <meta name="description" content="English Camp 2019 - Ngày hội sinh viên với ngoại ngữ">
+  <!-- keywords -->
+  <meta name="keywords"
+    content="bonjour uit, uit, bonjour, tsv, sinh vien, ngay hoi, doan, hoi, doan hoi, cong nghẹ thong tin, 2018">
+  <meta charset="utf-8">
+  <meta name="author" content="WebDev Studios">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1" />
+
+  <% include ../partials/css %>
+  <style>
+    h5 {
+      margin: 10px;
+    }
+
+    #submit {
+      font-size: 15px;
+      padding: 7px;
+
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container" style="margin-top: 30px;">
+    <form action="/admin/users/status" method="post">
+      <h2>Hãy điền thông tin cá nhân của bạn!</h2>
+      <hr>
+      <h5>Họ và tên</h5>
+      <input type="text" name="data" value="<%- data %>" style="display: none">
+      <input type="text" name="fullname">
+      <h5>Chọn trường</h5>
+      <select name="university" onchange='checkvalue(this.value)' class="form-control">
+        <% universities.map(university => { %>
+        <option value="<%- university.name  %>" icon="iw-way"><%- university.name  %></option>
+        <% }) %>
+        <option value="others">Trường nào đó khác ...</option>
+      </select>
+      <input type="text" name="university" id="university" style='display: none' placeholder="Nhập tên trường..." />
+      <h5>CLB</h5>
+      <select name="clb"  class="form-control" onchange='checkClb(this.value)'>
+      
+        <option value="CLB ECLUS (ĐH Luật)" icon="iw-way">CLB ECLUS (ĐH Luật)</option>
+        <option value="CLB ENF (HV Cán bộ)" icon="iw-way">CLB ENF (HV Cán bộ)</option>
+        <option value="CLB ENGSCOPE (ĐH Nông Lâm)" icon="iw-way">CLB ENGSCOPE (ĐH Nông Lâm)</option>
+        <option value="CLB ESC (ĐH Công nghiệp TP HCM)" icon="iw-way">CLB ESC (ĐH Công nghiệp TP HCM)</option>
+        <option value="CLB ESCULAPE (ĐH Y Khoa PNT)" icon="iw-way">CLB ESCULAPE (ĐH Y Khoa PNT)</option>
+        <option value="CLB FHQ_S (ĐH Sư Phạm Kỹ Thuật)" icon="iw-way">CLB FHQ_S (ĐH Sư Phạm Kỹ Thuật)</option>
+        <option value="CLB GLOBAL (HV Hành Chính)" icon="iw-way">CLB GLOBAL (HV Hành Chính)</option>
+        <option value="CLB ITEC (ĐH Mở)" icon="iw-way">CLB ITEC (ĐH Mở)</option>
+        <option value="CLB OISP (ĐH Bách Khoa)" icon="iw-way">CLB OISP (ĐH Bách Khoa)</option>
+        <option value="CLB SKILL IUH (ĐH Công nghiệp TP HCM)" icon="iw-way">CLB SKILL IUH (ĐH Công nghiệp TP HCM)</option>
+        <option value="CLB TESC (CĐ Kinh tế TP HCM)" icon="iw-way">CLB TESC (CĐ Kinh tế TP HCM)</option>
+        <option value="CLB TRIPLE E (HV Hàng Không)" icon="iw-way">CLB TRIPLE E (HV Hàng Không)</option>
+        <option value="THE ALOPEX (ĐH Quốc tế)" icon="iw-way">THE ALOPEX (ĐH Quốc tế)</option>
+        <option value="others">Khác</option>
+      </select>
+      <input type="text" name="clb" id="clb" style='display: none' placeholder="Nhập tên clb " />
+      
+      <hr>
+      <button type="submit" id="submit">Xác nhận</button>
+    </form>
+
+  </div>
+
+  <% include ../partials/scripts %>
+  <script>
+    function checkvalue(val) {
+      if (val === "others")
+        document.getElementById('university').style.display = 'block';
+      else
+        document.getElementById('university').style.display = 'none';
+    }
+    function checkClb(val) {
+      if (val === "others")
+        document.getElementById('clb').style.display = 'block';
+      else
+        document.getElementById('clb').style.display = 'none';
+    }
+  </script>
+</body>
+
+</html>
